@@ -5,6 +5,23 @@ const PredictionCard = ({ prediction }) => {
     return typeof value === 'number' ? value.toLocaleString('en-IN', { maximumFractionDigits: 2 }) : value;
   };
 
+  const formatInsightValue = (value) => {
+    if (typeof value === 'string') {
+      return value;
+    } else if (typeof value === 'object' && value !== null) {
+      // Handle object values by extracting meaningful information
+      if (value.predicted_value !== undefined) {
+        return `Predicted value: ${formatNumber(value.predicted_value)}${value.confidence_score ? ` (Confidence: ${(value.confidence_score * 100).toFixed(1)}%)` : ''}`;
+      } else if (value.yield_per_hectare !== undefined) {
+        return `Yield: ${formatNumber(value.yield_per_hectare)} tons/hectare${value.efficiency_rating ? ` (Efficiency: ${value.efficiency_rating})` : ''}`;
+      } else {
+        // Fallback: convert object to readable string
+        return JSON.stringify(value, null, 2).replace(/[{}",]/g, '').trim();
+      }
+    }
+    return String(value);
+  };
+
   if (!prediction || !prediction.prediction) {
     return (
       <div className="bg-gradient-to-r from-red-500 to-pink-600 rounded-2xl shadow-2xl p-8 text-white">
@@ -76,7 +93,7 @@ const PredictionCard = ({ prediction }) => {
             <span className="mr-2">📊</span>
             Production Analysis
           </h3>
-          <p className="text-green-100">{insights?.production_analysis}</p>
+          <p className="text-green-100">{formatInsightValue(insights?.production_analysis)}</p>
         </div>
         
         <div className="bg-white/10 rounded-xl p-4 backdrop-blur-sm">
@@ -84,7 +101,7 @@ const PredictionCard = ({ prediction }) => {
             <span className="mr-2">🌱</span>
             Yield Analysis
           </h3>
-          <p className="text-green-100">{insights?.yield_analysis}</p>
+          <p className="text-green-100">{formatInsightValue(insights?.yield_analysis)}</p>
         </div>
       </div>
 
@@ -100,7 +117,7 @@ const PredictionCard = ({ prediction }) => {
               </div>
               <h4 className="font-semibold">Recommendation {index + 1}</h4>
             </div>
-            <p className="text-green-100 text-sm">{recommendation}</p>
+            <p className="text-green-100 text-sm">{formatInsightValue(recommendation)}</p>
           </div>
         ))}
       </div>

@@ -9,12 +9,12 @@ router.post('/', async (req, res) => {
 		const { state_name, district_name, season, crop, crop_year, area } = req.body;
 
 		// 1. Call Python ML API (using port 8000 to avoid conflict with backend)
-		const response = await axios.post('http://127.0.0.1:8000/predict/basic', {
-			state: state_name,
-			district: district_name,
+		const response = await axios.post('http://127.0.0.1:8000/predict', {
+			state_name,
+			district_name,
 			season,
 			crop,
-			year: crop_year,
+			crop_year,
 			area
 		});
 

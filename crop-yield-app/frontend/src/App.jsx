@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import FarmDataForm from './components/FarmDataForm';
 import Dashboard from './pages/Dashboard';
@@ -8,8 +8,9 @@ import Home from './pages/Home';
 import './index.css';
 import './i18n';
 
-const App = () => {
+const AppContent = () => {
   const [currentPrediction, setCurrentPrediction] = useState(null);
+  const navigate = useNavigate();
 
   const handlePrediction = async (formData) => {
     try {
@@ -23,8 +24,11 @@ const App = () => {
         console.log('✅ Prediction successful:', response.data);
         setCurrentPrediction(response.data);
         
-        // Navigate to dashboard to show the prediction
-        window.location.href = '/dashboard';
+        // Store prediction in localStorage for persistence
+        localStorage.setItem('currentPrediction', JSON.stringify(response.data));
+        
+        // Navigate to dashboard using React Router
+        navigate('/dashboard');
       } else {
         console.error('❌ Prediction failed:', response.data);
         alert('Prediction failed. Please try again.');
@@ -36,7 +40,7 @@ const App = () => {
   };
 
   return (
-    <Router>
+    <>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -44,6 +48,14 @@ const App = () => {
         <Route path="/analytics" element={<AdvancedAnalytics />} />
         <Route path="/farm" element={<FarmDataForm onPredict={handlePrediction} />} />
       </Routes>
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 };

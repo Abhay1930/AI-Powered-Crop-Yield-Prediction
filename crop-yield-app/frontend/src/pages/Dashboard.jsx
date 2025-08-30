@@ -34,6 +34,7 @@ const Dashboard = ({ initialPrediction }) => {
 
   useEffect(() => {
     fetchHistorical();
+    loadPredictionFromStorage();
   }, []);
 
   // Set initial prediction if provided
@@ -43,6 +44,20 @@ const Dashboard = ({ initialPrediction }) => {
       console.log('✅ Initial prediction set:', initialPrediction);
     }
   }, [initialPrediction]);
+
+  // Load prediction from localStorage if available
+  const loadPredictionFromStorage = () => {
+    try {
+      const storedPrediction = localStorage.getItem('currentPrediction');
+      if (storedPrediction && !prediction) {
+        const parsedPrediction = JSON.parse(storedPrediction);
+        setPrediction(parsedPrediction);
+        console.log('✅ Prediction loaded from localStorage:', parsedPrediction);
+      }
+    } catch (error) {
+      console.error('❌ Error loading prediction from localStorage:', error);
+    }
+  };
 
   // Debug: Log when historical data changes
   useEffect(() => {
@@ -88,6 +103,7 @@ const Dashboard = ({ initialPrediction }) => {
       
       if (res.data && res.data.success) {
         setPrediction(res.data);
+        localStorage.setItem('currentPrediction', JSON.stringify(res.data));
         console.log('✅ Prediction set successfully:', res.data);
         
         // Refresh historical data after successful prediction
@@ -103,34 +119,7 @@ const Dashboard = ({ initialPrediction }) => {
     } catch (error) {
       console.error('❌ Error making prediction:', error);
       console.error('Error details:', error.response?.data || error.message);
-      
-      // Set sample prediction for demo
-      setPrediction({
-        success: true,
-        prediction: {
-          predicted_production: 5280,
-          yield_per_hectare: 5.2,
-          area_hectares: 1000,
-          unit: "tons"
-        },
-        inputs: {
-          state: "Maharashtra",
-          district: "Pune",
-          season: "Kharif",
-          crop: "Rice",
-          year: 2024,
-          area: 1000
-        },
-        insights: {
-          production_analysis: "Good production potential with 5,280 tons expected.",
-          yield_analysis: "Average yield expected: 5.2 tons/hectare.",
-          recommendations: [
-            "Consider crop rotation to maintain soil health",
-            "Monitor weather conditions for Kharif season",
-            "Follow recommended planting dates for optimal yield"
-          ]
-        }
-      });
+      alert('Error making prediction. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -258,16 +247,33 @@ const Dashboard = ({ initialPrediction }) => {
               <h1 className="text-4xl font-bold text-gray-900 mb-2">Crop Production Dashboard</h1>
               <p className="text-lg text-gray-600">Monitor and analyze your agricultural predictions</p>
             </div>
-            <button
-              onClick={fetchHistorical}
-              disabled={loading}
-              className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              <span>Refresh Data</span>
-            </button>
+            <div className="flex space-x-3">
+              <button
+                onClick={fetchHistorical}
+                disabled={loading}
+                className="bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Refresh Data</span>
+              </button>
+              {prediction && (
+                <button
+                  onClick={() => {
+                    setPrediction(null);
+                    localStorage.removeItem('currentPrediction');
+                    console.log('🗑️ Prediction data cleared');
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center space-x-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  <span>Clear Prediction</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -277,9 +283,25 @@ const Dashboard = ({ initialPrediction }) => {
           </div>
         )}
 
-        {prediction && (
+        {prediction ? (
           <div className="mb-8">
             <PredictionCard prediction={prediction} />
+          </div>
+        ) : (
+          <div className="mb-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-2xl p-8 text-white text-center">
+            <div className="bg-white/20 rounded-full p-4 w-16 h-16 mx-auto mb-4">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold mb-2">No Prediction Data Available</h2>
+            <p className="text-blue-100 mb-4">Make your first crop yield prediction to see detailed insights here.</p>
+            <a
+              href="/farm"
+              className="inline-block bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-200"
+            >
+              Make Prediction
+            </a>
           </div>
         )}
 
