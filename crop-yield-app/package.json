@@ -1,0 +1,19 @@
+{
+  "name": "crop-yield-app",
+  "version": "1.0.0",
+  "description": "Crop Yield Prediction App",
+  "main": "backend/server.js",
+  "scripts": {},
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "autoprefixer": "^10.4.21",
+    "axios": "^1.11.0",
+    "chart.js": "^4.5.0",
+    "i18next": "^25.4.2",
+    "postcss": "^8.5.6",
+    "react-chartjs-2": "^5.3.0",
+    "react-i18next": "^15.7.3",
+    "tailwindcss": "^4.1.12"
+  }
+}

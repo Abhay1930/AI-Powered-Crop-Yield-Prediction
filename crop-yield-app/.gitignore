@@ -1,0 +1,51 @@
+# ========================
+# Node.js backend
+# ========================
+node_modules/
+.env
+npm-debug.log
+yarn-error.log
+dist/
+build/
+
+# ========================
+# React frontend
+# ========================
+frontend/node_modules/
+frontend/build/
+frontend/.env
+frontend/.DS_Store
+frontend/node_modules/.cache/
+
+# ========================
+# Python ML scripts
+# ========================
+*.pyc
+__pycache__/
+ml_model/*.pkl
+ml_model/*.joblib
+.env
+.ipynb_checkpoints/
+
+# ========================
+# VS Code
+# ========================
+.vscode/
+.history/
+
+# ========================
+# OS / System files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# Logs
+# ========================
+*.log
+
+# ========================
+# Other large / temporary files
+# ========================
+*.tmp
+*.swp
