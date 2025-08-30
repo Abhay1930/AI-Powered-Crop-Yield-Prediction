@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5001"; // Node.js backend URL
+const BASE_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5003"; // Node.js backend URL
 const ML_API_URL = process.env.REACT_APP_ML_API_URL || "http://localhost:8000"; // ML model API URL
 const WEATHER_API_URL = "https://api.openweathermap.org/data/2.5"; // Weather API
 
