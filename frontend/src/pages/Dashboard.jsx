@@ -225,7 +225,12 @@ function Dashboard({ lang, setLang, weather, setWeather, soil, setSoil, predicti
         </div>
 
         {/* Results & Smart Advisory */}
-        <div className="lg:col-span-2 space-y-6">
+        <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 }}
+            className="lg:col-span-2 space-y-6"
+        >
             {prediction ? (
                 <>
                 <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between">
