@@ -21,10 +21,12 @@ class CropData(BaseModel):
     temperature: float
     humidity: float
     rainfall: float
-    ph: float
-    nitrogen: float
-    moisture: float
-    fertilizer_usage: float
+    soil_ph: float
+    soil_n: float
+    soil_p: float
+    soil_k: float
+    fertilizer: float
+    pesticide: float
 
 @app.get("/")
 def read_root():
@@ -36,13 +38,18 @@ def predict(data: CropData):
     data_dict = data.model_dump()
     
     # Get model prediction
-    yield_prediction = predict_yield(data_dict)
+    prediction_result = predict_yield(data_dict)
     
+    if "error" in prediction_result:
+        return prediction_result
+
     # Get smart advisory based on data
-    advisory = get_smart_advisory(data_dict, yield_prediction)
+    advisory = get_smart_advisory(data_dict, prediction_result)
     
     return {
-        "yield_prediction": yield_prediction,
+        "yield": prediction_result["yield"],
+        "confidence": prediction_result["confidence"],
+        "feature_importance": prediction_result["feature_importance"],
         "advisory": advisory
     }
 

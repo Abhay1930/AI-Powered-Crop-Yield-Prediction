@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 dist/
 build/
+# ML artifacts
+ml-service/*.joblib
+ml-service/data/final_dataset.csv
