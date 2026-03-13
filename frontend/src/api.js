@@ -31,3 +31,13 @@ export const getSoilData = async () => {
     throw error;
   }
 };
+
+export const getRealtimeWeather = async (lat, lon) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/weather-live?lat=${lat}&lon=${lon}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching live weather:', error);
+    throw error;
+  }
+};

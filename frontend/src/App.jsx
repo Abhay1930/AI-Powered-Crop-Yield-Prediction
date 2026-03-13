@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Leaf, Droplets, ThermometerSun, AlertTriangle, Languages, Mic, Activity } from 'lucide-react';
-import { getYieldPrediction, getWeatherData, getSoilData } from './api';
+import { Leaf, Droplets, ThermometerSun, AlertTriangle, Languages, Mic, Activity, MapPin, Loader2 } from 'lucide-react';
+import { getYieldPrediction, getWeatherData, getSoilData, getRealtimeWeather } from './api';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -28,6 +28,7 @@ const translations = {
     title: 'KrishiAI Dashboard',
     cropLabel: 'Crop Type',
     predictBtn: 'Predict Yield',
+    useLocation: 'Use My Location',
     yieldEst: 'Estimated Yield',
     weather: 'Weather Context',
     soil: 'Soil Health',
@@ -37,6 +38,7 @@ const translations = {
     title: 'कृषिAI डैशबोर्ड (KrishiAI Dashboard)',
     cropLabel: 'फसल का प्रकार (Crop Type)',
     predictBtn: 'उपज का अनुमान लगाएं (Predict Yield)',
+    useLocation: 'मेरा स्थान उपयोग करें (Use Location)',
     yieldEst: 'अनुमानित उपज (Estimated Yield)',
     weather: 'मौसम (Weather)',
     soil: 'मिट्टी का स्वास्थ्य (Soil Health)',
@@ -46,6 +48,7 @@ const translations = {
     title: 'କୃଷିAI ଡ୍ୟାସବୋର୍ଡ (KrishiAI Dashboard)',
     cropLabel: 'ଫସଲ ପ୍ରକାର (Crop Type)',
     predictBtn: 'ଅମଳ ପୂର୍ବାନୁମାନ (Predict Yield)',
+    useLocation: 'ମୋର ସ୍ଥାନ ବ୍ୟବହାର କରନ୍ତୁ (Use Location)',
     yieldEst: 'ପୂର୍ବାନୁମାନିତ ଅମଳ (Estimated Yield)',
     weather: 'ପାଣିପାଗ (Weather)',
     soil: 'ମୃତ୍ତିକା ସ୍ୱାସ୍ଥ୍ୟ (Soil Health)',
@@ -57,6 +60,7 @@ function App() {
   const [lang, setLang] = useState('en');
   const [weather, setWeather] = useState(null);
   const [soil, setSoil] = useState(null);
+  const [isLoadingWeather, setIsLoadingWeather] = useState(false);
   
   const [formData, setFormData] = useState({
     crop_type: 'wheat',
@@ -86,6 +90,38 @@ function App() {
       setFormData(prev => ({ ...prev, ph: s.ph, nitrogen: s.nitrogen, moisture: s.moisture }));
     }).catch(console.error);
   }, []);
+
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsLoadingWeather(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const { latitude, longitude } = position.coords;
+        const liveWeather = await getRealtimeWeather(latitude, longitude);
+        
+        setWeather(liveWeather);
+        setFormData(prev => ({ 
+          ...prev, 
+          temperature: liveWeather.temperature, 
+          humidity: liveWeather.humidity, 
+          rainfall: liveWeather.rainfall 
+        }));
+      } catch (error) {
+        console.error("Failed to fetch live weather", error);
+        alert("Could not fetch location weather data. Check your connection.");
+      } finally {
+        setIsLoadingWeather(false);
+      }
+    }, (error) => {
+      console.error(error);
+      alert("Unable to retrieve your location");
+      setIsLoadingWeather(false);
+    });
+  };
 
   const handlePredict = async (e) => {
     e?.preventDefault();
@@ -164,18 +200,45 @@ function App() {
         {/* Top Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           {/* Weather Panel */}
-          <div className="bg-white rounded-xl shadow-sm p-6 border border-krishi-100">
-            <div className="flex items-center space-x-2 text-krishi-700 mb-4">
-              <ThermometerSun className="w-6 h-6" />
-              <h2 className="text-xl font-semibold">{t.weather}</h2>
-            </div>
-            {weather ? (
-              <div className="space-y-2 text-gray-700">
-                <p>Temp: <span className="font-bold">{weather.temperature.toFixed(1)}°C</span></p>
-                <p>Humidity: <span className="font-bold">{weather.humidity.toFixed(1)}%</span></p>
-                <p>Rainfall: <span className="font-bold">{weather.rainfall.toFixed(1)}mm</span></p>
+          <div className="bg-white rounded-xl shadow-sm p-6 border border-krishi-100 flex flex-col justify-between items-start h-full">
+            <div className="w-full">
+              <div className="flex items-center justify-between text-krishi-700 mb-4">
+                <div className="flex items-center space-x-2">
+                  <ThermometerSun className="w-6 h-6" />
+                  <h2 className="text-xl font-semibold">{t.weather}</h2>
+                </div>
+                {weather?.locationName && (
+                  <span className="flex items-center text-xs font-semibold bg-krishi-100 text-krishi-700 px-2 py-1 rounded-full">
+                    <MapPin className="w-3 h-3 mr-1" />
+                    {weather.locationName}
+                  </span>
+                )}
               </div>
-            ) : <p className="animate-pulse text-gray-400">Loading...</p>}
+              
+              {isLoadingWeather ? (
+                <div className="animate-pulse space-y-3 w-full">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                </div>
+              ) : weather ? (
+                <div className="space-y-2 text-gray-700">
+                  <p>Temp: <span className="font-bold">{weather.temperature.toFixed(1)}°C</span></p>
+                  <p>Humidity: <span className="font-bold">{weather.humidity.toFixed(1)}%</span></p>
+                  <p>Rainfall: <span className="font-bold">{weather.rainfall.toFixed(1)}mm</span></p>
+                  {weather.condition && <p className="text-sm text-gray-500 italic mt-1">{weather.condition}</p>}
+                </div>
+              ) : <p className="animate-pulse text-gray-400">Loading...</p>}
+            </div>
+
+            <button 
+              onClick={handleUseLocation}
+              disabled={isLoadingWeather}
+              className="mt-5 w-full flex items-center justify-center text-sm bg-krishi-50 hover:bg-krishi-100 text-krishi-700 border border-krishi-200 py-2 rounded-lg transition"
+            >
+              {isLoadingWeather ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <MapPin className="w-4 h-4 mr-2" />}
+              {t.useLocation}
+            </button>
           </div>
 
           {/* Soil Panel */}
