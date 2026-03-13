@@ -170,7 +170,7 @@ function App() {
         label: 'Yield (kg/hectare)',
         data: [
           formData.crop_type === 'wheat' ? 3000 : formData.crop_type === 'rice' ? 4000 : 3500, 
-          prediction?.yield_prediction || 0
+          prediction?.yield || 0
         ],
         backgroundColor: ['rgba(156, 163, 175, 0.5)', 'rgba(34, 197, 94, 0.8)'],
         borderColor: ['#9ca3af', '#22c55e'],
@@ -223,9 +223,9 @@ function App() {
                 </div>
               ) : weather ? (
                 <div className="space-y-2 text-gray-700">
-                  <p>Temp: <span className="font-bold">{weather.temperature.toFixed(1)}°C</span></p>
-                  <p>Humidity: <span className="font-bold">{weather.humidity.toFixed(1)}%</span></p>
-                  <p>Rainfall: <span className="font-bold">{weather.rainfall.toFixed(1)}mm</span></p>
+                  <p>Temp: <span className="font-bold">{weather.temperature?.toFixed(1) || '0'}°C</span></p>
+                  <p>Humidity: <span className="font-bold">{weather.humidity?.toFixed(1) || '0'}%</span></p>
+                  <p>Rainfall: <span className="font-bold">{weather.rainfall?.toFixed(1) || '0'}mm</span></p>
                   {weather.condition && <p className="text-sm text-gray-500 italic mt-1">{weather.condition}</p>}
                 </div>
               ) : <p className="animate-pulse text-gray-400">Loading...</p>}
@@ -249,9 +249,9 @@ function App() {
             </div>
             {soil ? (
               <div className="space-y-2 text-gray-700">
-                <p>pH Level: <span className="font-bold">{soil.ph.toFixed(1)}</span></p>
-                <p>Nitrogen: <span className="font-bold">{soil.nitrogen.toFixed(1)} mg/kg</span></p>
-                <p>Moisture: <span className="font-bold">{soil.moisture.toFixed(1)}%</span></p>
+                <p>pH Level: <span className="font-bold">{soil.ph?.toFixed(1) || '0'}</span></p>
+                <p>Nitrogen: <span className="font-bold">{soil.nitrogen?.toFixed(1) || '0'} mg/kg</span></p>
+                <p>Moisture: <span className="font-bold">{soil.moisture?.toFixed(1) || '0'}%</span></p>
               </div>
             ) : <p className="animate-pulse text-gray-400">Loading...</p>}
           </div>
@@ -262,11 +262,11 @@ function App() {
               <AlertTriangle className="w-6 h-6" />
               <h2 className="text-xl font-semibold text-gray-800">{t.advisory}</h2>
             </div>
-            {prediction ? (
+            {prediction?.advisory ? (
               <div className="space-y-3 text-sm">
-                <p className="flex items-start"><Droplets className="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0"/> {prediction.advisory.irrigation}</p>
-                <p className="flex items-start"><Leaf className="w-4 h-4 mr-2 mt-0.5 text-krishi-500 flex-shrink-0"/> {prediction.advisory.fertilizer}</p>
-                <p className="flex items-start"><AlertTriangle className="w-4 h-4 mr-2 mt-0.5 text-red-500 flex-shrink-0"/> {prediction.advisory.pest_risk}</p>
+                <p className="flex items-start"><Droplets className="w-4 h-4 mr-2 mt-0.5 text-blue-500 flex-shrink-0"/> {prediction.advisory.irrigation || 'N/A'}</p>
+                <p className="flex items-start"><Leaf className="w-4 h-4 mr-2 mt-0.5 text-krishi-500 flex-shrink-0"/> {prediction.advisory.fertilizer || 'N/A'}</p>
+                <p className="flex items-start"><AlertTriangle className="w-4 h-4 mr-2 mt-0.5 text-red-500 flex-shrink-0"/> {prediction.advisory.pest_risk || 'N/A'}</p>
               </div>
             ) : <p className="text-gray-400 italic">Predict yield to see advisory.</p>}
           </div>
@@ -332,7 +332,7 @@ function App() {
               <div className="w-full text-center fade-in">
                 <h3 className="text-xl font-medium text-gray-500 mb-2">{t.yieldEst}</h3>
                 <div className="text-5xl font-extrabold text-krishi-600 mb-8">
-                  {prediction.yield_prediction.toLocaleString()} <span className="text-2xl text-gray-500 font-normal">kg/ha</span>
+                  {prediction.yield?.toLocaleString() || '0'} <span className="text-2xl text-gray-500 font-normal">kg/ha</span>
                 </div>
                 
                 <div className="w-full h-64 flex justify-center">
