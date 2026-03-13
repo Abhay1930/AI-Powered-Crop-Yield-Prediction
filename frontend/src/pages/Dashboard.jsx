@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Leaf, Droplets, ThermometerSun, AlertTriangle, Mic, Activity, MapPin, Loader2, TrendingUp, Info, ChevronRight, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getYieldPrediction, getRealtimeWeather } from '../api/api';
