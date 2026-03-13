@@ -24,14 +24,54 @@ if (process.env.MONGO_URI) {
   console.log('No MONGO_URI provided in .env - skipping MongoDB connection');
 }
 
-// Proxies prediction request to ML service
+// Mongoose Schema for Predictions
+const predictionSchema = new mongoose.Schema({
+  crop_type: String,
+  state: String,
+  yield: Number,
+  confidence: Number,
+  feature_importance: Object,
+  advisory: Object,
+  date: { type: Date, default: Date.now },
+  inputs: Object
+});
+
+const Prediction = mongoose.model('Prediction', predictionSchema);
+
+// Proxies prediction request to ML service and saves to history
 app.post('/api/predict', async (req, res) => {
   try {
     const response = await axios.post(`${ML_SERVICE_URL}/predict`, req.body);
-    res.json(response.data);
+    const predictionData = response.data;
+
+    // Save to MongoDB history if connected
+    if (mongoose.connection.readyState === 1) {
+      const newPrediction = new Prediction({
+        crop_type: req.body.crop_type,
+        state: req.body.state || 'Unknown',
+        yield: predictionData.yield,
+        confidence: predictionData.confidence,
+        feature_importance: predictionData.feature_importance,
+        advisory: predictionData.advisory,
+        inputs: req.body
+      });
+      await newPrediction.save();
+    }
+
+    res.json(predictionData);
   } catch (error) {
     console.error('Error calling ML service:', error.message);
     res.status(500).json({ error: 'Failed to predict yield' });
+  }
+});
+
+// GET History
+app.get('/api/history', async (req, res) => {
+  try {
+    const history = await Prediction.find().sort({ date: -1 }).limit(50);
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch history' });
   }
 });
 

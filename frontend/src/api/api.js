@@ -12,6 +12,16 @@ export const getYieldPrediction = async (data) => {
   }
 };
 
+export const getHistory = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/history`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching history:', error);
+      throw error;
+    }
+  };
+
 export const getWeatherData = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/weather`);
