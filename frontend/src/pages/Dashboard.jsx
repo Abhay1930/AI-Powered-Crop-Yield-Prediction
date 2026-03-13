@@ -22,6 +22,19 @@ function Dashboard({ weather, setWeather, soil, setSoil, prediction, setPredicti
   const { t, lang } = useLanguage();
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
   const [isPredicting, setIsPredicting] = useState(false);
+  const [formData, setFormData] = useState({
+    crop_type: 'wheat',
+    temperature: 25,
+    humidity: 60,
+    rainfall: 100,
+    soil_ph: 6.5,
+    soil_n: 40,
+    soil_p: 30,
+    soil_k: 30,
+    fertilizer: 100,
+    pesticide: 50,
+    state: 'Assam'
+  });
 
   useEffect(() => {
     if (weather) {
