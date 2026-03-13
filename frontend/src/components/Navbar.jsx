@@ -1,58 +1,104 @@
-import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Lightbulb, History, Leaf } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Lightbulb, History, Leaf, Globe, LogOut, User, LogIn } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import { motion } from 'framer-motion';
 
 const Navbar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const { lang, setLang, t } = useLanguage();
 
     const navItems = [
-        { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-        { path: '/insights', label: 'AI Insights', icon: Lightbulb },
-        { path: '/history', label: 'History', icon: History },
+        { path: '/', label: t.nav.dashboard, icon: LayoutDashboard },
+        { path: '/insights', label: t.nav.insights, icon: Lightbulb },
+        { path: '/history', label: t.nav.history, icon: History },
     ];
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
-        <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between h-16">
-                    <div className="flex items-center">
-                        <div className="flex-shrink-0 flex items-center">
-                            <Leaf className="h-8 w-8 text-green-600 mr-2" />
-                            <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-green-800">KrishiAI</span>
-                        </div>
-                        <div className="hidden sm:ml-8 sm:flex sm:space-x-8">
-                            {navItems.map((item) => (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors duration-200 ${
-                                        location.pathname === item.path
-                                            ? 'border-green-600 text-gray-900'
-                                            : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                                    }`}
-                                >
-                                    <item.icon className="w-4 h-4 mr-2" />
-                                    {item.label}
-                                </Link>
-                            ))}
-                        </div>
+        <nav className="w-full md:w-72 bg-white border-r border-gray-100 flex flex-col h-screen sticky top-0 z-50">
+            <div className="p-6">
+                <div className="flex items-center space-x-3 mb-10">
+                    <div className="p-2 bg-green-600 rounded-xl">
+                        <Leaf className="h-6 w-6 text-white" />
                     </div>
-                    {/* Mobile menu button (simplified for now) */}
-                    <div className="flex items-center sm:hidden">
-                        <div className="flex space-x-4">
-                            {navItems.map((item) => (
-                                <Link
-                                    key={item.path}
-                                    to={item.path}
-                                    className={`${
-                                        location.pathname === item.path ? 'text-green-600' : 'text-gray-400'
-                                    }`}
-                                >
-                                    <item.icon className="w-6 h-6" />
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
+                    <span className="text-2xl font-black text-gray-800 tracking-tighter">KrishiAI</span>
                 </div>
+
+                <div className="space-y-2">
+                    {navItems.map((item) => (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            className={`flex items-center space-x-3 px-4 py-3 rounded-2xl transition-all duration-200 group ${
+                                location.pathname === item.path
+                                    ? 'bg-green-600 text-white shadow-lg shadow-green-200'
+                                    : 'text-gray-500 hover:bg-gray-50 hover:text-green-600'
+                            }`}
+                        >
+                            <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-white' : 'group-hover:text-green-600'}`} />
+                            <span className="font-bold">{item.label}</span>
+                        </Link>
+                    ))}
+                </div>
+            </div>
+
+            <div className="mt-auto p-6 space-y-4">
+                {/* Language Toggle */}
+                <button 
+                    onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 rounded-2xl text-gray-600 hover:bg-gray-100 transition shadow-sm"
+                >
+                    <div className="flex items-center space-x-3 text-sm font-bold">
+                        <Globe className="w-4 h-4 text-green-600" />
+                        <span>{lang === 'en' ? 'हिन्दी' : 'English'}</span>
+                    </div>
+                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase font-black">Toggle</span>
+                </button>
+
+                {/* User Info / Auth */}
+                {user ? (
+                    <div className="p-4 bg-gray-900 rounded-3xl text-white shadow-xl">
+                        <div className="flex items-center space-x-3 mb-4">
+                            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
+                                {user.name.charAt(0)}
+                            </div>
+                            <div className="overflow-hidden">
+                                <p className="text-sm font-bold truncate">{user.name}</p>
+                                <p className="text-[10px] text-gray-400 truncate opacity-70">Farmer Profile</p>
+                            </div>
+                        </div>
+                        <button 
+                            onClick={handleLogout}
+                            className="w-full flex items-center justify-center space-x-2 py-2.5 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold transition"
+                        >
+                            <LogOut className="w-4 h-4 text-red-400" />
+                            <span>{t.nav.logout}</span>
+                        </button>
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        <Link 
+                            to="/login"
+                            className="w-full flex items-center justify-center space-x-2 py-3 bg-green-600 text-white rounded-2xl font-bold shadow-lg hover:bg-green-700 transition active:scale-95"
+                        >
+                            <LogIn className="w-4 h-4" />
+                            <span>{t.nav.login}</span>
+                        </Link>
+                        <Link 
+                            to="/signup"
+                            className="w-full flex items-center justify-center space-x-2 py-3 bg-white border-2 border-green-600 text-green-600 rounded-2xl font-bold hover:bg-green-50 transition active:scale-95"
+                        >
+                            <span>{t.nav.signup}</span>
+                        </Link>
+                    </div>
+                )}
             </div>
         </nav>
     );

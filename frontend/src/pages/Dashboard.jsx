@@ -16,39 +16,12 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-const translations = {
-  en: {
-    title: 'AI Crop Dashboard',
-    cropLabel: 'Crop Type',
-    predictBtn: 'Predict Yield',
-    useLocation: 'Update Location weather',
-    yieldEst: 'Estimated Yield',
-    weather: 'Environmental Conditions',
-    soil: 'Soil Analytics',
-    advisory: 'Actionable Advice',
-    aiInsights: 'AI Intelligent Insights'
-  },
-  // ... other langs can be added
-};
+import { useLanguage } from '../context/LanguageContext';
 
-function Dashboard({ lang, setLang, weather, setWeather, soil, setSoil, prediction, setPrediction }) {
+function Dashboard({ weather, setWeather, soil, setSoil, prediction, setPrediction }) {
+  const { t, lang } = useLanguage();
   const [isLoadingWeather, setIsLoadingWeather] = useState(false);
   const [isPredicting, setIsPredicting] = useState(false);
-  const [formData, setFormData] = useState({
-    crop_type: 'wheat',
-    temperature: 25,
-    humidity: 60,
-    rainfall: 100,
-    soil_ph: 6.5,
-    soil_n: 40,
-    soil_p: 30,
-    soil_k: 30,
-    fertilizer: 100,
-    pesticide: 50,
-    state: 'Assam'
-  });
-
-  const t = translations[lang] || translations['en'];
 
   useEffect(() => {
     if (weather) {
@@ -111,7 +84,7 @@ function Dashboard({ lang, setLang, weather, setWeather, soil, setSoil, predicti
             <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
               <ThermometerSun className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-gray-800">{t.weather}</h3>
+            <h3 className="font-bold text-gray-800">{t.dashboard.weather}</h3>
           </div>
           {weather ? (
              <div className="grid grid-cols-2 gap-4">
@@ -139,7 +112,7 @@ function Dashboard({ lang, setLang, weather, setWeather, soil, setSoil, predicti
             <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
               <Activity className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-gray-800">{t.soil}</h3>
+            <h3 className="font-bold text-gray-800">{t.dashboard.soil}</h3>
           </div>
           {soil ? (
              <div className="grid grid-cols-2 gap-4">
@@ -191,7 +164,7 @@ function Dashboard({ lang, setLang, weather, setWeather, soil, setSoil, predicti
         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 lg:col-span-1">
             <div className="flex items-center space-x-2 mb-6">
                 <Info className="w-5 h-5 text-green-600" />
-                <h2 className="text-xl font-bold text-gray-800">Parameters</h2>
+                <h2 className="text-xl font-bold text-gray-800">{t.dashboard.params}</h2>
             </div>
             <form onSubmit={handlePredict} className="space-y-4">
                 <div>
@@ -220,7 +193,7 @@ function Dashboard({ lang, setLang, weather, setWeather, soil, setSoil, predicti
                     disabled={isPredicting}
                     className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-xl shadow-lg transition-transform active:scale-95 disabled:opacity-50"
                 >
-                    {isPredicting ? 'Analyzing...' : 'Generate Prediction'}
+                    {isPredicting ? t.dashboard.analyzing : t.dashboard.predictBtn}
                 </button>
             </form>
         </div>

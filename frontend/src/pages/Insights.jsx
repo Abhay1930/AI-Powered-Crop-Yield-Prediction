@@ -13,7 +13,10 @@ import { motion } from 'framer-motion';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+import { useLanguage } from '../context/LanguageContext';
+
 const Insights = ({ prediction }) => {
+  const { t } = useLanguage();
   if (!prediction) {
     return (
       <motion.div 
