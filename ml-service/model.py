@@ -88,7 +88,10 @@ def predict_yield(data: dict) -> dict:
         # Construct vector for inverse scaler
         inverse_vec = scaled_df.copy()
         inverse_vec.at[0, 'yield'] = prediction_normalized
-        yield_final = _scaler.inverse_transform(inverse_vec)[0, -1]
+        yield_raw = _scaler.inverse_transform(inverse_vec)[0, -1]
+        
+        # Convert from tonnes/hectare (CSV unit) to kg/hectare as requested
+        yield_final = yield_raw * 1000
         
         # 6. Confidence Score
         # For RF, use prediction variance across trees
