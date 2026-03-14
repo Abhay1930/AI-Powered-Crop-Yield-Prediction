@@ -11,6 +11,7 @@ const translations = {
       login: 'Login',
       signup: 'Signup',
       profile: 'Profile',
+      satellite: 'Satellite',
       logout: 'Logout'
     },
     dashboard: {
@@ -36,6 +37,7 @@ const translations = {
       login: 'लॉगिन',
       signup: 'साइन अप',
       profile: 'प्रोफ़ाइल',
+      satellite: 'सैटेलाइट',
       logout: 'लॉग आउट'
     },
     dashboard: {
@@ -51,6 +53,32 @@ const translations = {
       fertilizer: 'उर्वरक',
       pestRisk: 'कीट जोखिम',
       avgYield: 'क्षेत्रीय औसत'
+    }
+  },
+  or: {
+    nav: {
+      dashboard: 'ଡ୍ୟାସବୋର୍ଡ',
+      insights: 'AI ଅନ୍ତର୍ଦୃଷ୍ଟି',
+      history: 'ଇତିହାସ',
+      login: 'ଲଗଇନ୍',
+      signup: 'ସାଇନ୍ ଅପ୍',
+      profile: 'ପ୍ରୋଫାଇଲ୍',
+      satellite: 'ସାଟେଲାଇଟ୍',
+      logout: 'ଲଗଆଉଟ୍'
+    },
+    dashboard: {
+      title: 'AI ଫସଲ ଡ୍ୟାସବୋର୍ଡ',
+      weather: 'ପରିବେଶ ପରିସ୍ଥିତି',
+      soil: 'ମାଟି ବିଶ୍ଳେଷଣ',
+      aiStatus: 'AI ସ୍ଥିତି',
+      params: 'ପାରାମିଟରଗୁଡିକ',
+      predictBtn: 'ପୂର୍ବାନୁମାନ କରନ୍ତୁ',
+      analyzing: 'ବିଶ୍ଳେଷଣ ଚାଲିଛି...',
+      yieldEst: 'ଆନୁମାନିକ ଅମଳ',
+      irrigation: 'ଜଳସେଚନ',
+      fertilizer: 'ସାର',
+      pestRisk: 'କୀଟ ବିପଦ',
+      avgYield: 'ଆଞ୍ଚଳିକ ହାରାହାରି'
     }
   }
 };

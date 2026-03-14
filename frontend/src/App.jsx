@@ -6,9 +6,11 @@ import Insights from './pages/Insights';
 import History from './pages/History';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import SatelliteMonitoring from './pages/SatelliteMonitoring';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { getRealtimeWeather } from './api/api';
+import KrishiGPT from './components/KrishiGPT';
 
 const AppContent = () => {
   const [weather, setWeather] = useState(null);
@@ -16,10 +18,18 @@ const AppContent = () => {
   const [prediction, setPrediction] = useState(null);
   const { user, loading } = useAuth();
 
+  const fetchWeather = async (lat, lon, city = null) => {
+    try {
+      const data = await getRealtimeWeather(lat, lon);
+      if (city) data.locationName = city;
+      setWeather(data);
+    } catch (error) {
+      console.error('Weather Update Error:', error);
+    }
+  };
+
   useEffect(() => {
-    // Initial data fetch
-    getRealtimeWeather(28.6139, 77.2090).then(setWeather).catch(console.error);
-    // Mock soil
+    fetchWeather(20.9517, 85.0985, 'Odisha');
     setSoil({ ph: 6.5, nitrogen: 45, moisture: 30 });
   }, []);
 
@@ -38,13 +48,16 @@ const AppContent = () => {
         <Navbar />
         <main className="flex-1 p-4 md:p-8 overflow-y-auto max-h-screen">
           <Routes>
-            <Route path="/" element={<Dashboard weather={weather} setWeather={setWeather} soil={soil} setSoil={setSoil} prediction={prediction} setPrediction={setPrediction} />} />
+            <Route path="/" element={<Dashboard weather={weather} setWeather={setWeather} soil={soil} setSoil={setSoil} prediction={prediction} setPrediction={setPrediction} fetchWeather={fetchWeather} />} />
             <Route path="/insights" element={<Insights prediction={prediction} />} />
             <Route path="/history" element={<History />} />
             <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
             <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/" />} />
+            <Route path="/satellite-monitoring" element={<SatelliteMonitoring />} />
           </Routes>
         </main>
+        {/* KrishiGPT floats globally across all pages */}
+        <KrishiGPT weather={weather} prediction={prediction} />
       </div>
     </Router>
   );

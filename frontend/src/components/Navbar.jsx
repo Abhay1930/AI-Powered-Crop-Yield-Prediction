@@ -13,6 +13,7 @@ const Navbar = () => {
     const navItems = [
         { path: '/', label: t.nav.dashboard, icon: LayoutDashboard },
         { path: '/insights', label: t.nav.insights, icon: Lightbulb },
+        { path: '/satellite-monitoring', label: t.nav.satellite, icon: Globe },
         { path: '/history', label: t.nav.history, icon: History },
     ];
 
@@ -44,6 +45,9 @@ const Navbar = () => {
                         >
                             <item.icon className={`w-5 h-5 ${location.pathname === item.path ? 'text-white' : 'group-hover:text-green-600'}`} />
                             <span className="font-bold">{item.label}</span>
+                            {item.path === '/satellite-monitoring' && (
+                                <span className="ml-auto text-[8px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full font-black animate-pulse">SIH ELITE</span>
+                            )}
                         </Link>
                     ))}
                 </div>
@@ -52,14 +56,17 @@ const Navbar = () => {
             <div className="mt-auto p-6 space-y-4">
                 {/* Language Toggle */}
                 <button 
-                    onClick={() => setLang(lang === 'en' ? 'hi' : 'en')}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 rounded-2xl text-gray-600 hover:bg-gray-100 transition shadow-sm"
+                    onClick={() => {
+                        const cycle = { 'en': 'hi', 'hi': 'or', 'or': 'en' };
+                        setLang(cycle[lang]);
+                    }}
+                    className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 rounded-2xl text-gray-600 hover:bg-gray-100 transition shadow-sm border border-gray-100"
                 >
                     <div className="flex items-center space-x-3 text-sm font-bold">
                         <Globe className="w-4 h-4 text-green-600" />
-                        <span>{lang === 'en' ? 'हिन्दी' : 'English'}</span>
+                        <span className="capitalize">{lang === 'or' ? 'ଓଡ଼ିଆ' : lang === 'hi' ? 'हिन्दी' : 'English'}</span>
                     </div>
-                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase font-black">Toggle</span>
+                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full uppercase font-black">Next</span>
                 </button>
 
                 {/* User Info / Auth */}
@@ -67,10 +74,10 @@ const Navbar = () => {
                     <div className="p-4 bg-gray-900 rounded-3xl text-white shadow-xl">
                         <div className="flex items-center space-x-3 mb-4">
                             <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold">
-                                {user.name.charAt(0)}
+                                {(user.name || user.email || 'F').charAt(0).toUpperCase()}
                             </div>
                             <div className="overflow-hidden">
-                                <p className="text-sm font-bold truncate">{user.name}</p>
+                                <p className="text-sm font-bold truncate">{user.name || user.email || 'Farmer'}</p>
                                 <p className="text-[10px] text-gray-400 truncate opacity-70">Farmer Profile</p>
                             </div>
                         </div>

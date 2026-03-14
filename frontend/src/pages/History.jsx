@@ -9,6 +9,7 @@ const History = () => {
     const { t } = useLanguage();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     getHistory().then(data => {
@@ -19,6 +20,11 @@ const History = () => {
       setLoading(false);
     });
   }, []);
+
+  const filteredHistory = history.filter(item => {
+    const q = searchQuery.toLowerCase();
+    return !q || item.crop_type?.toLowerCase().includes(q) || item.state?.toLowerCase().includes(q);
+  });
 
   return (
     <motion.div 
@@ -35,9 +41,15 @@ const History = () => {
         <div className="flex items-center space-x-2">
             <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input type="text" placeholder="Search crops..." className="pl-9 pr-4 py-2 bg-gray-50 border-0 rounded-lg text-sm focus:ring-2 focus:ring-green-500 outline-none" />
+                <input 
+                  type="text"
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  placeholder="Search by crop or state..." 
+                  className="pl-9 pr-4 py-2 bg-gray-50 border-0 rounded-lg text-sm focus:ring-2 focus:ring-green-500 outline-none w-52" 
+                />
             </div>
-            <button className="p-2 bg-gray-50 rounded-lg text-gray-500 hover:bg-gray-100 transition">
+            <button onClick={() => setSearchQuery('')} className="p-2 bg-gray-50 rounded-lg text-gray-500 hover:bg-gray-100 transition">
                 <Filter className="w-4 h-4" />
             </button>
         </div>
@@ -49,7 +61,7 @@ const History = () => {
                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mb-4"></div>
                <p>Fetching historical data...</p>
            </div>
-        ) : history.length > 0 ? (
+        ) : filteredHistory.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -64,7 +76,7 @@ const History = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 <AnimatePresence>
-                  {history.map((item, idx) => (
+                  {filteredHistory.map((item, idx) => (
                     <motion.tr 
                       key={item._id || idx}
                       initial={{ opacity: 0 }}
@@ -76,20 +88,20 @@ const History = () => {
                       <td className="px-6 py-4">
                           <div className="flex items-center space-x-3">
                               <div className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-600 font-bold text-xs uppercase">
-                                  {item.crop_type.charAt(0)}
+                                  {item.crop_type?.charAt(0) || '?'}
                               </div>
                               <span className="font-semibold text-gray-700 capitalize">{item.crop_type}</span>
                           </div>
                       </td>
                       <td className="px-6 py-4 text-gray-600 text-sm">{item.state}</td>
                       <td className="px-6 py-4">
-                          <span className="font-bold text-gray-800">{item.yield.toLocaleString()}</span>
+                          <span className="font-bold text-gray-800">{item.yield?.toLocaleString() || '--'}</span>
                       </td>
                       <td className="px-6 py-4 flex justify-center">
                           <div className={`px-2 py-1 rounded text-[10px] font-bold uppercase ${
                               item.confidence > 0.8 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                           }`}>
-                              {(item.confidence * 100).toFixed(0)}% Match
+                              {(item.confidence * 100)?.toFixed(0)}% Match
                           </div>
                       </td>
                       <td className="px-6 py-4 text-gray-400 text-xs text-nowrap">
@@ -150,8 +162,8 @@ const History = () => {
                     <Calendar className="w-6 h-6" />
                 </div>
                 <div>
-                   <p className="text-sm text-gray-400 font-medium">Total Samples</p>
-                   <p className="text-2xl font-black text-gray-800">{history.length}</p>
+                   <p className="text-sm text-gray-400 font-medium">Matching Samples</p>
+                   <p className="text-2xl font-black text-gray-800">{filteredHistory.length} <span className="text-sm font-normal text-gray-400">/ {history.length}</span></p>
                 </div>
             </div>
         </motion.div>
